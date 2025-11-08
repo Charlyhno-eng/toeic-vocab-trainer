@@ -20,6 +20,7 @@ export async function updateCounter(id: number, success: boolean) {
   let counter = word.counter;
   if (success) counter = Math.min(counter + 1, 10);
   else counter = Math.max(counter - 1, 0);
+
   const isMemorized = counter === 10;
 
   return prisma.translate.update({

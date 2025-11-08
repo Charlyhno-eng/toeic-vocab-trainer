@@ -39,11 +39,30 @@ export default function Quiz() {
 
     if (isRight) setScore((s) => s + 1);
 
-    await fetch(`/api/translate/${id}`, {
+    const res = await fetch(`/api/translate/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ success: isRight }),
     });
+
+    // Log content-type and status for debugging
+    console.log(
+      "PATCH status:",
+      res.status,
+      "Content-Type:",
+      res.headers.get("content-type"),
+    );
+    // Try to read the raw text
+    const raw = await res.text();
+    console.log("PATCH response text:", raw);
+
+    let updatedWord = null;
+    try {
+      updatedWord = raw ? JSON.parse(raw) : null;
+      console.log("Parsed JSON:", updatedWord);
+    } catch (err) {
+      console.error("JSON parse error:", err);
+    }
   };
 
   const handleNext = () => {
