@@ -8,6 +8,7 @@ export async function PATCH(
   const { success } = await request.json();
   const id = Number(params.id);
   const updatedWord = await updateCounter(id, success);
+
   if (!updatedWord)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 

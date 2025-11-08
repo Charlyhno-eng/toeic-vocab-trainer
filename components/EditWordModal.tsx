@@ -42,7 +42,7 @@ export default function EditWordModal({ open, onClose }: Props) {
           setTranslation("");
           onClose();
         }
-      } catch (err) {
+      } catch {
         setError("Network error");
       }
       setLoading(false);
