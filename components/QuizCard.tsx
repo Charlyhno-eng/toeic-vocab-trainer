@@ -15,6 +15,8 @@ type Props = {
   onAnswer: (answer: string) => void;
   score: number;
   total: number;
+  answered: boolean;
+  onNext: () => void;
 };
 
 export default function QuizCard({
@@ -25,6 +27,8 @@ export default function QuizCard({
   onAnswer,
   score,
   total,
+  answered,
+  onNext,
 }: Props) {
   return (
     <Card
@@ -35,8 +39,8 @@ export default function QuizCard({
         borderColor: "#363662",
         boxShadow: "0 4px 32px 0 rgba(34,34,51,0.4)",
         borderRadius: 2,
-        minWidth: 480,
-        maxWidth: 720,
+        minWidth: 340,
+        maxWidth: 480,
         width: "100%",
         mx: "auto",
       }}
@@ -67,12 +71,12 @@ export default function QuizCard({
               if (answer === correct) {
                 bg = "#22c55e";
                 border = "#22c55e";
-                text = "#fff";
+                text = "#dad6f8";
               }
               if (chosen === answer && answer !== correct) {
                 bg = "#e53935";
                 border = "#e53935";
-                text = "#fff";
+                text = "#dad6f8";
               }
             }
 
@@ -97,6 +101,24 @@ export default function QuizCard({
             );
           })}
         </Stack>
+        {answered && (
+          <Box mt={3} display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={onNext}
+              sx={{
+                fontWeight: "bold",
+                bgcolor: "#363662",
+                color: "#dad6f8",
+                "&:hover": { bgcolor: "#232347", color: "#dad6f8" },
+              }}
+              endIcon={<span>&gt;</span>}
+            >
+              Next
+            </Button>
+          </Box>
+        )}
       </CardContent>
     </Card>
   );

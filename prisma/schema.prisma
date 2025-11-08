@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../database/db.sqlite"
+}
+
+model Translate {
+  id          Int     @id @default(autoincrement())
+  word        String  @unique
+  translation String
+  counter     Int     @default(0)
+  isMemorized Boolean @default(false)
+
+  @@map("translate")
+}
