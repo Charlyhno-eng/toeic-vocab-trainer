@@ -1,43 +1,72 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import QuizCard from "./QuizCard";
 
-type TypeQuiz = {
+type Translate = {
   id: number;
-  question: string;
-  answers: string[];
-  correct: string;
+  word: string;
+  translation: string;
+  counter: number;
+  isMemorized: boolean;
 };
 
-const questions: TypeQuiz[] = [
-  {
-    id: 1,
-    question: "What is the English word for 'Chien'?",
-    answers: ["Dog", "Cat", "Bird", "Fish", "Horse", "Rabbit"],
-    correct: "Dog",
-  },
-  {
-    id: 2,
-    question: "What is the English word for 'Chat'?",
-    answers: ["Dog", "Cat", "Bird", "Fish", "Horse", "Rabbit"],
-    correct: "Cat",
-  },
-];
+function getRandomWords(words: Translate[], currentId: number) {
+  const distractors = words.filter((w) => w.id !== currentId);
+  for (let i = distractors.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [distractors[i], distractors[j]] = [distractors[j], distractors[i]];
+  }
+  return distractors.slice(0, 5).map((w) => w.translation);
+}
+
+function shuffle(array: string[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
 export default function Quiz() {
+  const [words, setWords] = useState<Translate[]>([]);
   const [current, setCurrent] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [chosen, setChosen] = useState<string | null>(null);
   const [answered, setAnswered] = useState<boolean>(false);
+  const [answers, setAnswers] = useState<string[]>([]);
 
-  const handleAnswer = (answer: string) => {
+  useEffect(() => {
+    fetch("/api/translate")
+      .then((res) => res.json())
+      .then((data) => setWords(data));
+  }, []);
+
+  useEffect(() => {
+    if (words.length > 0 && current < words.length) {
+      const correct = words[current].translation;
+      const distractors = getRandomWords(words, words[current].id);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAnswers(shuffle([correct, ...distractors]));
+    }
+  }, [words, current]);
+
+  const handleAnswer = async (answer: string) => {
     setChosen(answer);
     setAnswered(true);
-    if (answer === questions[current].correct) {
-      setScore((s) => s + 1);
-    }
+
+    const correct = words[current].translation;
+    const id = words[current].id;
+    const isRight = answer === correct;
+
+    if (isRight) setScore((s) => s + 1);
+
+    await fetch(`/api/translate/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ success: isRight }),
+    });
   };
 
   const handleNext = () => {
@@ -46,7 +75,15 @@ export default function Quiz() {
     setCurrent((c) => c + 1);
   };
 
-  if (current >= questions.length) {
+  if (words.length === 0) {
+    return (
+      <Box>
+        <Typography>Loading…</Typography>
+      </Box>
+    );
+  }
+
+  if (current >= words.length) {
     return (
       <Box
         sx={{
@@ -60,22 +97,25 @@ export default function Quiz() {
         }}
       >
         <Typography fontWeight="bold" mb={2}>
-          Score: {score} / {questions.length}
+          Score: {score} / {words.length}
         </Typography>
         <Typography>Quiz complete!</Typography>
       </Box>
     );
   }
 
+  const question = words[current].word;
+  const correct = words[current].translation;
+
   return (
     <QuizCard
-      question={questions[current].question}
-      answers={questions[current].answers}
-      correct={questions[current].correct}
+      question={`What is the English word for '${question}'?`}
+      answers={answers}
+      correct={correct}
       chosen={chosen}
       onAnswer={handleAnswer}
       score={score}
-      total={questions.length}
+      total={words.length}
       answered={answered}
       onNext={handleNext}
     />
