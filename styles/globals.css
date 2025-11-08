@@ -1,0 +1,17 @@
+:root {
+    --background-center: #2e2e4d;
+    --background-edge: #121221;
+    --foreground: #dad6f8;
+}
+
+body {
+    color: var(--foreground);
+    background: radial-gradient(
+        circle at center,
+        var(--background-center) 0%,
+        var(--background-edge) 100%
+    );
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
