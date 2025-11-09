@@ -2,6 +2,19 @@
 
 toeic-vocab-trainer is a Next.js application that uses a SQLite database to help users learn vocabulary in any target language. The initial focus is English, but the app can be customized for any language.
 
+![Presentation](public/presentation.png)
+
+### Installation
+
+```bash
+git clone [URL]
+cd toeic-vocab-trainer
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+```
+
 ### Features
 
 - Add new vocabulary entries with translations in the target language.
